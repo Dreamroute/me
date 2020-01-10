@@ -42,7 +42,6 @@ public class MeRegister {
             }
         } catch (Exception e) {
             log.error("注册到ME失败" + e, e);
-            System.exit(-1);
         }
     }
 
@@ -54,24 +53,20 @@ public class MeRegister {
         Long platformId = config.getPlatformId();
         if (platformId == null) {
             log.error("配置文件中缺少me.platformId配置");
-            System.exit(-1);
         }
 
         List<Adapter> ads = config.getAdapter();
         if (ads == null || ads.isEmpty()) {
             log.error("配置文件中缺少me.adapter配置");
-            System.exit(-1);
         }
 
         for (Adapter ad : ads) {
             String mapping = ad.getMapping();
             if (mapping == null || mapping.length() == 0) {
                 log.error("配置文件中缺少me.mapping配置");
-                System.exit(-1);
             }
             if (!isJson(mapping)) {
                 log.error("配置文件中me.mapping格式不正确，需要符合JSON格式");
-                System.exit(-1);
             }
         }
     }
