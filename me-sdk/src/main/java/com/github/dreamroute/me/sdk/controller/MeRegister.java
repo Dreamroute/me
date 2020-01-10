@@ -8,9 +8,9 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.scheduling.annotation.Scheduled;
 
 import com.alibaba.fastjson.JSON;
-import com.bdfint.base.util.IPUtil;
 import com.github.dreamroute.me.sdk.common.Adapter;
 import com.github.dreamroute.me.sdk.common.Config;
+import com.github.dreamroute.me.sdk.common.IpUtil;
 
 import lombok.extern.slf4j.Slf4j;
 
@@ -48,7 +48,7 @@ public class MeRegister {
 
     private void validateMapping(Config config) {
         
-        String ip = IPUtil.getDockerIp();
+        String ip = IpUtil.getIp();
         config.setHeartbeatIp(ip);
 
         Long platformId = config.getPlatformId();
