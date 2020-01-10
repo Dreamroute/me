@@ -48,7 +48,7 @@ stable dev deploy:
     url: http://${PROJECT_URL_PREFIX}.stable-dev.${AUTO_DEVOPS_DOMAIN}
   variables:
     APOLLO: "stable-dev"
-    KUBE_NAMESPACES: "dev-${PROJECT_GROUP_NAME}"  # k8s namespace
+    KUBE_NAMESPACES: "stable-dev-${PROJECT_GROUP_NAME}"  # k8s namespace
     k8s_url: ${PROJECT_URL_PREFIX}.stable-dev.${AUTO_DEVOPS_DOMAIN} # ingress 域名
   script:
     - batch_deploy
@@ -63,7 +63,7 @@ stable test deploy:
   when: manual
   variables:
     APOLLO: "stable-test"
-    KUBE_NAMESPACES: "test-${PROJECT_GROUP_NAME}" # k8s namespace
+    KUBE_NAMESPACES: "stable-test-${PROJECT_GROUP_NAME}" # k8s namespace
     k8s_url: ${PROJECT_URL_PREFIX}.stable-test.${AUTO_DEVOPS_DOMAIN} # ingress 域名
   script:
     - batch_deploy
