@@ -1,0 +1,109 @@
+---
+# Source: k8s/templates/service.yaml
+#apiVersion: v1
+#kind: Service
+#metadata:
+#  name: me-server
+#  labels:
+#    app.kubernetes.io/name: me-server
+#    helm.sh/chart: k8s-0.1.0
+#spec:
+#  type: ClusterIP
+#  ports:
+#    - port: 7500
+#      targetPort: 7500
+#      protocol: TCP
+#      name: me-server
+#  selector:
+#    app.kubernetes.io/name: me-server
+
+---
+# Source: k8s/templates/deployment.yaml
+apiVersion: apps/v1beta2
+kind: Deployment
+metadata:
+  name: me-server
+  labels:
+    app.kubernetes.io/name: me-server
+    helm.sh/chart: k8s-0.1.0
+spec:
+  replicas: k8s.replicas
+  strategy:
+    rollingUpdate:
+      maxSurge: 1
+      maxUnavailable: 0
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: me-server
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: me-server
+    spec:
+      imagePullSecrets:
+      - name: bdfint
+      containers:
+        - name: me-server
+          image: "k8s.images:k8s.tag"
+          imagePullPolicy: IfNotPresent
+          volumeMounts:
+            - mountPath: /app/skywalking
+              name: skywalking
+          ports:
+          - containerPort: 7500
+          env:
+          - name: cluster
+            value: apollo
+          - name: JAVA_OPTS
+            value: k8s.jvm
+          livenessProbe:
+            failureThreshold: 3
+            initialDelaySeconds: 240
+            periodSeconds: 20
+            successThreshold: 1
+            tcpSocket:
+              port: 7500
+            timeoutSeconds: 5
+          readinessProbe:
+            failureThreshold: 3
+            initialDelaySeconds: 30
+            periodSeconds: 10
+            successThreshold: 1
+            tcpSocket:
+              port: 7500
+            timeoutSeconds: 5
+          resources:
+            limits:
+              cpu: 2000m
+              memory: 2Gi
+            requests:
+              cpu: 10m
+              memory: 512Mi
+      volumes:
+      - name: skywalking
+        hostPath:
+          path: /app/nfsdata/kubernetes/skywalking/apollo
+
+            
+
+---
+# Source: k8s/templates/ingress.yaml
+#apiVersion: extensions/v1beta1
+#kind: Ingress
+#metadata:
+#  name: me-server
+#  labels:
+#    app.kubernetes.io/name: me-server
+#    helm.sh/chart: k8s-0.1.0
+#  annotations:
+#    nginx.ingress.kubernetes.io/proxy-body-size: 50m
+#    
+#spec:
+#  rules:
+#    - host: "k8s.url"
+#      http:
+#        paths:
+#          - path: /
+#            backend:
+#              serviceName: me-server
+#              servicePort: 7500
