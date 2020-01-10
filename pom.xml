@@ -22,6 +22,7 @@
 	</distributionManagement>
 
 	<properties>
+		<base>1.0.1-RELEASE</base>
 		<java.version>1.8</java.version>
 		<apollo.version>1.3.0</apollo.version>
 		<me.version>1.0.4-RELEASE</me.version>
@@ -57,7 +58,7 @@
 		<dependency>
 			<groupId>com.bdfint</groupId>
 			<artifactId>base</artifactId>
-			<version>1.0.1-RELEASE</version>
+			<version>${base}</version>
 		</dependency>
 
 		<!-- apollo -->
