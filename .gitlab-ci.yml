@@ -24,7 +24,7 @@ maven package build:
   cache:
     key: ${CI_COMMIT_REF_SLUG}
     paths:
-      - ./target/*
+      - ./*/target/*
 
 
 docker package build:
@@ -40,7 +40,7 @@ docker package build:
   cache:
     key: ${CI_COMMIT_REF_SLUG}
     paths:
-      - ./target/*
+      - ./*/target/*
     policy: pull
 
 stable-dev deploy:
@@ -122,7 +122,7 @@ prod deploy:
     fi
 
     echo "正在发布到镜像仓库..."
-
+    cd me-server/
     if [[ -f Dockerfile ]]; then
       # CACHE_FROM=$CI_REGISTRY_IMAGE/cache-from
       docker build -t $IMAGE:$TAG .
@@ -130,6 +130,7 @@ prod deploy:
       echo "删除本地镜像..."
       docker rmi $IMAGE:$TAG
     fi
+    cd ..
   }
   function delete() {
     echo "准备删除旧的部署..."
