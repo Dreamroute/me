@@ -1,21 +1,21 @@
 ---
 # Source: k8s/templates/service.yaml
-apiVersion: v1
-kind: Service
-metadata:
-  name: me-client
-  labels:
-    app.kubernetes.io/name: me-client
-    helm.sh/chart: k8s-0.1.0
-spec:
-  type: ClusterIP
-  ports:
-    - port: 7600
-      targetPort: 7600
-      protocol: TCP
-      name: me-client
-  selector:
-    app.kubernetes.io/name: me-client
+#apiVersion: v1
+#kind: Service
+#metadata:
+#  name: me-client
+#  labels:
+#    app.kubernetes.io/name: me-client
+#    helm.sh/chart: k8s-0.1.0
+#spec:
+#  type: ClusterIP
+#  ports:
+#    - port: 7600
+#      targetPort: 7600
+#      protocol: TCP
+#      name: me-client
+#  selector:
+#    app.kubernetes.io/name: me-client
 
 ---
 # Source: k8s/templates/deployment.yaml
@@ -87,22 +87,22 @@ spec:
 
 ---
 # Source: k8s/templates/ingress.yaml
-apiVersion: extensions/v1beta1
-kind: Ingress
-metadata:
-  name: me-client
-  labels:
-    app.kubernetes.io/name: me-client
-    helm.sh/chart: k8s-0.1.0
-  annotations:
-    nginx.ingress.kubernetes.io/proxy-body-size: 50m
-    
-spec:
-  rules:
-    - host: "k8s.url"
-      http:
-        paths:
-          - path: /
-            backend:
-              serviceName: me-client
-              servicePort: 7600
+#piVersion: extensions/v1beta1
+#ind: Ingress
+#etadata:
+# name: me-client
+# labels:
+#   app.kubernetes.io/name: me-client
+#   helm.sh/chart: k8s-0.1.0
+# annotations:
+#   nginx.ingress.kubernetes.io/proxy-body-size: 50m
+#   
+#pec:
+# rules:
+#   - host: "k8s.url"
+#     http:
+#       paths:
+#         - path: /
+#           backend:
+#             serviceName: me-client
+#             servicePort: 7600
