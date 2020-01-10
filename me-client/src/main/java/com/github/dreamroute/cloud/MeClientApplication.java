@@ -17,10 +17,10 @@ import org.springframework.web.bind.annotation.GetMapping;
 @EnableFeignClients(basePackages = {"com.github.dreamroute.me.sdk"})
 @ComponentScan(basePackages = {"com.github.dreamroute.cloud", "com.github.dreamroute.me.sdk"})
 @SpringBootApplication(exclude = {DataSourceAutoConfiguration.class, HibernateJpaAutoConfiguration.class})
-public class CloudApplication {
+public class MeClientApplication {
 
     public static void main(String[] args) {
-        SpringApplication.run(CloudApplication.class, args);
+        SpringApplication.run(MeClientApplication.class, args);
     }
 
     @GetMapping("/health")
