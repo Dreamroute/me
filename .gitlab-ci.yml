@@ -12,7 +12,7 @@ variables:
   PROJECT_GROUP_NAME: common  # 项目名称，对接k8s namespaces
   k8s_replicas: 1  # k8s pod数
   k8s_port: 80  # pod端口，检测转发
-  batch_program: me-cilent,me-server
+  batch_program: me-client,me-server
   batch_port: "7600,7500"
 
 maven package build:
