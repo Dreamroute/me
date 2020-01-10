@@ -31,7 +31,7 @@ public class MeRegister {
     @Value("${server.port}")
     private int port;
 
-    @Scheduled(cron = "1/5 * * * * ?")
+    @Scheduled(cron = "1/30 * * * * ?")
     public void register() {
         validateMapping(config);
         config.setHeartbeatPort(port);
