@@ -8,7 +8,7 @@ stages:
 variables:
   JVM_PARAM: "-XX:MaxRAM=1200m"
   KUBECONFIG: /etc/kubernetes/config
-  PROJECT_URL_PREFIX: me  # 访问URL前缀
+  PROJECT_URL_PREFIX: me-server  # 访问URL前缀
   PROJECT_GROUP_NAME: common  # 项目名称，对接k8s namespaces
   k8s_replicas: 1  # k8s pod数
   k8s_port: 7500  # pod端口，检测转发
