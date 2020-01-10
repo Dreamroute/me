@@ -1,0 +1,194 @@
+stages:
+  - maven-build
+  - docker-build
+  - dev
+  - test
+  - prod
+
+variables:
+  JVM_PARAM: "-XX:MaxRAM=1200m"
+  KUBECONFIG: /etc/kubernetes/config
+  PROJECT_URL_PREFIX: me  # 访问URL前缀
+  PROJECT_GROUP_NAME: common  # 项目名称，对接k8s namespaces
+  k8s_replicas: 1  # k8s pod数
+  k8s_port: 7500  # pod端口，检测转发
+
+
+maven package build:
+  stage: maven-build
+  script:
+    - rm -rf /home/gitlab-runner/maven-repo/com/bdfint
+    - mvn clean package -DskipTests
+  tags:
+    - shell-build
+  cache:
+    key: ${CI_COMMIT_REF_SLUG}
+    paths:
+      - ./target/*
+
+
+docker package build:
+  stage: docker-build
+  script:
+    - build
+  variables:
+    APOLLO: "default"
+  tags:
+    - shell-build
+  #  only:
+  #  - master
+  cache:
+    key: ${CI_COMMIT_REF_SLUG}
+    paths:
+      - ./target/*
+    policy: pull
+
+stable-dev deploy:
+  stage: dev
+  environment:
+    name: dev
+    url: http://${PROJECT_URL_PREFIX}.dev.${AUTO_DEVOPS_DOMAIN}
+  variables:
+    APOLLO: "stable-dev"
+    KUBE_NAMESPACES: "dev-${PROJECT_GROUP_NAME}"  # k8s namespace
+    k8s_url: ${PROJECT_URL_PREFIX}.dev.${AUTO_DEVOPS_DOMAIN} # ingress 域名
+  script:
+    - deploy
+  tags:
+    - shell-build
+
+stable-test deploy:
+  stage: test
+  environment:
+    name: test
+    url: http://${PROJECT_URL_PREFIX}.test.${AUTO_DEVOPS_DOMAIN}
+  when: manual
+  variables:
+    APOLLO: "stable-test"
+    KUBE_NAMESPACES: "test-${PROJECT_GROUP_NAME}" # k8s namespace
+    k8s_url: ${PROJECT_URL_PREFIX}.test.${AUTO_DEVOPS_DOMAIN} # ingress 域名
+  script:
+    - deploy
+  only:
+    - master
+  tags:
+    - shell-build
+
+
+prod deploy:
+  stage: prod
+  script:
+    - prod_deploy
+  environment:
+    name: prod
+    url: http://${PROJECT_URL_PREFIX}.zlgx.com/
+  when: manual
+  variables:
+    APOLLO: "production"
+    KUBE_NAMESPACES: "${PROJECT_GROUP_NAME}" # k8s namespace
+    k8s_url: ${PROJECT_URL_PREFIX}.zlgx.com # ingress 域名
+    KUBECONFIG: .kube/config
+    k8s_replicas: 2
+  only:
+    - master
+  tags:
+    - shell-build
+
+
+.auto_devops: &auto_devops |
+  [[ "$TRACE" ]] && set -x
+  export IMAGE=${GIT_REGISTRY_URL}/${GIT_REGISTRY_PROJECT}/${CI_PROJECT_NAME}
+  export TAG=${CI_PIPELINE_ID}_${CI_COMMIT_SHA:0:6}
+  function deploy() {
+    # k8s yaml文件
+    helm template helm/ \
+      --name= $CI_PROJECT_NAME \
+      --set image.repository=$IMAGE \
+      --set image.tag=$TAG \
+      --set ingress.hosts[0]=$k8s_url \
+      --set service.port=$k8s_port \
+      --set nameOverride=${CI_PROJECT_NAME} \
+      --set replicaCount=$k8s_replicas \
+      --set apollo=$APOLLO \
+      --set jvm=$JVM_PARAM \
+      > deployment.yaml
+    cat deployment.yaml
+    kubectl apply -f deployment.yaml -n $KUBE_NAMESPACES
+  }
+  function build() {
+    if [[ -n "$GIT_REGISTRY_USER" ]]; then
+      echo "登录Harbor仓库..."
+      docker login -u "$GIT_REGISTRY_USER" -p "$GIT_REGISTRY_PASSWD" "$GIT_REGISTRY_URL"
+    fi
+
+    echo "正在发布到镜像仓库..."
+
+    if [[ -f Dockerfile ]]; then
+      # CACHE_FROM=$CI_REGISTRY_IMAGE/cache-from
+      docker build -t $IMAGE:$TAG .
+      docker push $IMAGE:$TAG
+      echo "删除本地镜像..."
+      docker rmi $IMAGE:$TAG
+    fi
+  }
+  function delete() {
+    echo "准备删除旧的部署..."
+    kubectl delete --namespace="$KUBE_NAMESPACES"  -f deployment.yaml
+  }
+  function staging_deploy() {
+    # push images
+    export Aliyun=$GIT_REGISTRY_ALIYUN/bdfint/${CI_PROJECT_NAME}
+    if [[ -n "$GIT_REGISTRY_USER_ALIYUN" ]]; then
+      docker login -u "$GIT_REGISTRY_USER_ALIYUN" -p "$GIT_REGISTRY_PASSWD_ALIYUN" "$GIT_REGISTRY_ALIYUN"
+    fi
+    docker pull $IMAGE:$TAG
+    docker tag $IMAGE:$TAG $Aliyun:$TAG
+    docker push $Aliyun:$TAG
+    docker rmi $IMAGE:$TAG $Aliyun:$TAG
+    # kubernetes config
+    mkdir .kube
+    echo $KUBE_ALIYUN_STAGING |base64 -d > $KUBECONFIG
+    # create imagepull secret
+    kubectl describe secret bdfint -n "$KUBE_NAMESPACES" || kubectl get secret bdfint -o yaml -n default | sed "s/default/${KUBE_NAMESPACES}/g" | kubectl -n "$KUBE_NAMESPACES" create -f -
+    # k8s yaml文件
+    helm template helm/ \
+      --name= $CI_PROJECT_NAME \
+      --set image.repository=$Aliyun \
+      --set image.tag=$TAG \
+      --set ingress.hosts[0]=$k8s_url \
+      --set service.port=$k8s_port \
+      --set nameOverride=${CI_PROJECT_NAME} \
+      --set replicaCount=$k8s_replicas \
+      --set apollo=$APOLLO \
+      --set jvm=$JVM_PARAM \
+      > deployment.yaml
+    cat deployment.yaml
+    kubectl apply -f deployment.yaml -n $KUBE_NAMESPACES
+  }
+  function prod_deploy() {
+    # kubernetes config
+    export Aliyun=$GIT_REGISTRY_ALIYUN/bdfint/${CI_PROJECT_NAME}
+    mkdir .kube
+    echo $KUBE_ALIYUN_PROD |base64 -d > $KUBECONFIG
+    # create imagepull secret
+    kubectl describe secret bdfint -n "$KUBE_NAMESPACES" || kubectl get secret bdfint -o yaml -n default | sed "s/default/${KUBE_NAMESPACES}/g" | kubectl -n "$KUBE_NAMESPACES" create -f -
+    # k8s yaml文件
+    helm template helm/ \
+      --name= $CI_PROJECT_NAME \
+      --set image.repository=$Aliyun \
+      --set image.tag=$TAG \
+      --set ingress.hosts[0]=$k8s_url \
+      --set service.port=$k8s_port \
+      --set nameOverride=${CI_PROJECT_NAME} \
+      --set replicaCount=$k8s_replicas \
+      --set apollo=$APOLLO \
+      --set jvm=$JVM_PARAM \
+      > deployment.yaml
+    cat deployment.yaml
+    kubectl apply -f deployment.yaml -n $KUBE_NAMESPACES
+  }
+
+
+before_script:
+  - *auto_devops
+
