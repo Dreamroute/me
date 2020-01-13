@@ -34,10 +34,10 @@ import tk.mybatis.spring.annotation.MapperScan;
 @MapperScan(basePackages = {"com.github.dreamroute.me.server.mapper"})
 @ComponentScan(basePackageClasses = ESClientConfig.class, includeFilters = {@Filter(type = FilterType.ASSIGNABLE_TYPE, classes = {ESClientConfig.class})}, useDefaultFilters = false)
 @ComponentScan(basePackageClasses = DataSourceConfig.class, includeFilters = {@Filter(type = FilterType.ASSIGNABLE_TYPE, classes = {DataSourceConfig.class})}, useDefaultFilters = false)
-public class MeApplication {
+public class MeServerApplication {
 
     public static void main(String[] args) {
-        SpringApplication.run(MeApplication.class, args);
+        SpringApplication.run(MeServerApplication.class, args);
     }
     
     @GetMapping("/health")

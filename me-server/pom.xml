@@ -5,16 +5,17 @@
 	<parent>
 		<groupId>com.github.dreamroute</groupId>
 		<artifactId>me</artifactId>
-		<version>0.0.1-SNAPSHOT</version>
+		<version>1.0.9-RELEASE</version>
 	</parent>
 	<artifactId>me-server</artifactId>
+	<version>0.0.1-SNAPSHOT</version>
 
 	<dependencies>
 		<!-- me-sdk -->
 		<dependency>
 			<groupId>com.github.dreamroute</groupId>
 			<artifactId>me-sdk</artifactId>
-			<version>${me.version}</version>
+			<version>${project.parent.version}</version>
 		</dependency>
 	</dependencies>
 
@@ -25,6 +26,13 @@
 				<artifactId>spring-boot-maven-plugin</artifactId>
 				<configuration>
 					<fork>true</fork>
+				</configuration>
+			</plugin>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-deploy-plugin</artifactId>
+				<configuration>
+					<skip>true</skip>
 				</configuration>
 			</plugin>
 		</plugins>
