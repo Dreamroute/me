@@ -22,7 +22,7 @@
 	</distributionManagement>
 
 	<properties>
-		<base>1.0.1-RELEASE</base>
+		<base>1.0.2-RELEASE</base>
 		<java.version>1.8</java.version>
 		<apollo.version>1.3.0</apollo.version>
 		<junit-jupiter.version>5.5.2</junit-jupiter.version>
