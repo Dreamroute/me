@@ -22,13 +22,15 @@
 	</distributionManagement>
 
 	<properties>
-		<base>1.0.2-RELEASE</base>
 		<java.version>1.8</java.version>
 		<apollo.version>1.3.0</apollo.version>
+		<fastjson.version>1.2.62</fastjson.version>
+		<base.version>1.0.2-RELEASE</base.version>
 		<junit-jupiter.version>5.5.2</junit-jupiter.version>
 		<elasticsearch.version>7.5.0</elasticsearch.version>
 		<spring-cloud.version>Greenwich.SR2</spring-cloud.version>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+		<rocketmq-spring-boot-starter.version>2.0.4</rocketmq-spring-boot-starter.version>
 		<spring-cloud-consul-dependencies.version>2.1.2.RELEASE</spring-cloud-consul-dependencies.version>
 	</properties>
 
@@ -57,7 +59,7 @@
 		<dependency>
 			<groupId>com.bdfint</groupId>
 			<artifactId>base</artifactId>
-			<version>${base}</version>
+			<version>${base.version}</version>
 		</dependency>
 
 		<!-- apollo -->
@@ -83,7 +85,7 @@
 		<dependency>
 			<groupId>org.apache.rocketmq</groupId>
 			<artifactId>rocketmq-spring-boot-starter</artifactId>
-			<version>2.0.4</version>
+			<version>${rocketmq-spring-boot-starter.version}</version>
 		</dependency>
 
 		<!-- es -->
@@ -102,7 +104,7 @@
 		<dependency>
 			<groupId>com.alibaba</groupId>
 			<artifactId>fastjson</artifactId>
-			<version>1.2.62</version>
+			<version>${fastjson.version}</version>
 		</dependency>
 
 		<!-- spring -->
@@ -136,6 +138,11 @@
 		<dependency>
 			<groupId>org.springframework.cloud</groupId>
 			<artifactId>spring-cloud-starter-netflix-ribbon</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-configuration-processor</artifactId>
+			<optional>true</optional>
 		</dependency>
 	</dependencies>
 
