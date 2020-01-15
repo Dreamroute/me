@@ -1,6 +1,7 @@
 package com.github.dreamroute.me.sdk.controller;
 
 import java.util.List;
+import java.util.Objects;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -30,6 +31,9 @@ public class MeRegister {
 
     @Value("${server.port}")
     private int port;
+    
+    @Value("${me.client.ip:error}")
+    private String ip;
 
     @Scheduled(cron = "1/30 * * * * ?")
     public void register() {
@@ -47,7 +51,8 @@ public class MeRegister {
 
     private void validateMapping(Config config) {
         
-        String ip = IpUtil.getIp();
+        if (Objects.equals(ip, "error"))
+            ip = IpUtil.getIp();
         config.setHeartbeatIp(ip);
 
         Long platformId = config.getPlatformId();
