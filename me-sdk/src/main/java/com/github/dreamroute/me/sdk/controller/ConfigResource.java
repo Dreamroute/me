@@ -1,8 +1,8 @@
 package com.github.dreamroute.me.sdk.controller;
 
 import org.springframework.cloud.openfeign.FeignClient;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
 
 import com.github.dreamroute.me.sdk.common.Config;
 
@@ -12,7 +12,7 @@ import com.github.dreamroute.me.sdk.common.Config;
 @FeignClient(value = "me")
 public interface ConfigResource {
 
-    @RequestMapping("/registryConfig")
+    @PostMapping("/registryConfig")
     public int registryConfig(@RequestBody Config config);
 
 }
