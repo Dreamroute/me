@@ -21,7 +21,7 @@ import io.netty.channel.socket.nio.NioServerSocketChannel;
 import io.netty.channel.socket.nio.NioSocketChannel;
 import io.netty.util.CharsetUtil;
 
-public class Server {
+public class Netty {
 
     @Test
     public void serverTest() throws Exception {
@@ -47,6 +47,17 @@ public class Server {
                             public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) throws Exception {
                                 cause.printStackTrace();
                             }
+                            
+                            @Override
+                            public void handlerAdded(ChannelHandlerContext ctx) throws Exception {
+                                System.err.println("handlerAdded.");
+                            }
+                            
+                            @Override
+                            public void handlerRemoved(ChannelHandlerContext ctx) throws Exception {
+                                System.err.println("handlerRemoved.");
+                            }
+                            
                         });
                     }
                 }).bind().sync().channel().closeFuture().sync();
@@ -78,5 +89,25 @@ public class Server {
             }
         }).connect().sync().channel().closeFuture().sync();
     }
+    
+    @Test
+    public void compositeTest() {
+        Charset utf8 = Charset.forName("UTF-8");
+        ByteBuf buf = Unpooled.copiedBuffer("Netty in Action rocks!", utf8);    //1
+        System.out.println((char)buf.readByte());                    //2
+
+        int readerIndex = buf.readerIndex();                        //3
+        int writerIndex = buf.writerIndex();                        //4
+
+        buf.writeByte((byte)'?');                            //5
+
+        assert readerIndex == buf.readerIndex();
+        assert writerIndex != buf.writerIndex();
+    }
+    
+    @Test
+    public void channelHandlerTest() {
+    }
+    
 
 }
