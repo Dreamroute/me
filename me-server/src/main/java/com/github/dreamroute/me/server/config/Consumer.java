@@ -59,6 +59,7 @@ public class Consumer implements RocketMQListener<String> {
             throw new MeException("此异常无需解决，业务系统已经下线，抛异常避免消息被消费");
         }
         Adapter adapter = adapterMap.get(tableName);
+        log.info("Adapter: " + JSON.toJSONString(adapter, true));
 
         // 处理ddl语句
         if (opt.isDdl()) {
@@ -67,6 +68,7 @@ public class Consumer implements RocketMQListener<String> {
         }
 
         // 处理数据
+        log.info("开始进行数据处理");
         String[] data = processData(opt, platformId, adapter);
         log.info("处理之后的数据: " + JSON.toJSONString(data));
         // 此处很关键，data == null说明远程回调全部失败，表示客户端已经下线，需要抛出异常，避免消息被消费掉
