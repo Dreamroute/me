@@ -12,6 +12,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestClientException;
 import org.springframework.web.client.RestTemplate;
 
+import com.alibaba.fastjson.JSON;
 import com.github.dreamroute.me.sdk.common.Const;
 
 import lombok.extern.slf4j.Slf4j;
@@ -31,6 +32,7 @@ public class Heartbeat {
      */
     @Scheduled(cron = "1/20 * * * * ?")
     public void checkClient() {
+        log.info("打印Adapter: " + JSON.toJSONString(ConfigStore.PLATFORMID_ADAPTER, true));
         Map<Long, Set<String>> clientInfo = ConfigStore.CONN;
         if (clientInfo != null && !clientInfo.isEmpty()) {
             for (Map.Entry<Long, Set<String>> client : clientInfo.entrySet()) {
