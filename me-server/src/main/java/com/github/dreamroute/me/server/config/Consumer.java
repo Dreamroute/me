@@ -68,6 +68,7 @@ public class Consumer implements RocketMQListener<String> {
 
         // 处理数据
         String[] data = processData(opt, platformId, adapter);
+        log.info("处理之后的数据: " + JSON.toJSONString(data));
         // 此处很关键，data == null说明远程回调全部失败，表示客户端已经下线，需要抛出异常，避免消息被消费掉
         if (data == null || data.length == 0) {
             throw new MeException("此异常无需解决，处理需要回调的数据完成，但是得到的数据结果为空，可能是回调业务端出错或者是业务端下线了，此处抛出异常，等待下一次继续消费此消息");
@@ -75,6 +76,7 @@ public class Consumer implements RocketMQListener<String> {
 
         // crud
         String index = adapter.getIndex();
+        log.info("开始进行INSERT/UPDATA/DELETE操作");
         for (String d : data) {
             if (Objects.equals(opt.getType(), "INSERT")) {
                 createIndexIfAbsent(platformId, index);
@@ -85,6 +87,7 @@ public class Consumer implements RocketMQListener<String> {
                 crudService.delete(JSON.parseObject(d, BaseEntity.class).getId(), index);
             }
         }
+        log.info("INSERT/UPDATA/DELETE操作完成");
     }
 
     /**
