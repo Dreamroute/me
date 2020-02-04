@@ -21,7 +21,7 @@ import io.netty.channel.socket.nio.NioServerSocketChannel;
 import io.netty.channel.socket.nio.NioSocketChannel;
 import io.netty.util.CharsetUtil;
 
-public class Netty {
+public class NettyTest {
 
     @Test
     public void serverTest() throws Exception {
