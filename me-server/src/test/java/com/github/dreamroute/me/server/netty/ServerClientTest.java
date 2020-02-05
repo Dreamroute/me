@@ -16,6 +16,7 @@ import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.SocketChannel;
 import io.netty.channel.socket.nio.NioServerSocketChannel;
 import io.netty.channel.socket.nio.NioSocketChannel;
+import io.netty.handler.timeout.IdleStateHandler;
 
 public class ServerClientTest {
 
@@ -60,7 +61,16 @@ public class ServerClientTest {
         Bootstrap bootstrap = new Bootstrap().group(new NioEventLoopGroup()).channel(NioSocketChannel.class).option(ChannelOption.SO_KEEPALIVE, true).handler(new ChannelInitializer<SocketChannel>() {
             @Override
             protected void initChannel(SocketChannel ch) throws Exception {
-                ch.pipeline().addLast(new ChannelInboundHandlerAdapter() {
+                ch.pipeline()
+                .addLast(new IdleStateHandler(0, 0, 3))
+                .addLast(new ChannelInboundHandlerAdapter() {
+                    
+                    @Override
+                    public void userEventTriggered(ChannelHandlerContext ctx, Object evt) throws Exception {
+                        System.err.println("trigger.");
+                        System.err.println(evt);
+                    }
+                    
                     @Override
                     public void channelRead(ChannelHandlerContext ctx, Object msg) throws Exception {
                         ByteBuf buf = (ByteBuf) msg;
@@ -77,9 +87,9 @@ public class ServerClientTest {
 
                     @Override
                     public void channelActive(ChannelHandlerContext ctx) throws Exception {
-                        ByteBuf buf = ctx.alloc().buffer();
-                        buf.writeCharSequence("send data.", Charset.forName("UTF-8"));
-                        ctx.writeAndFlush(buf);
+//                        ByteBuf buf = ctx.alloc().buffer();
+//                        buf.writeCharSequence("send data.", Charset.forName("UTF-8"));
+//                        ctx.writeAndFlush(buf);
                     }
                 });
             }

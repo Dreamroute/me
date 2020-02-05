@@ -13,6 +13,6 @@ import com.github.dreamroute.me.sdk.common.Config;
 public interface ConfigResource {
 
     @PostMapping("/registryConfig")
-    public int registryConfig(@RequestBody Config config);
+    public String registryConfig(@RequestBody Config config);
 
 }

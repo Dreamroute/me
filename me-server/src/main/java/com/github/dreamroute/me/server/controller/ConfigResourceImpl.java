@@ -13,6 +13,7 @@ import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.github.dreamroute.me.sdk.common.Adapter;
 import com.github.dreamroute.me.sdk.common.Config;
+import com.github.dreamroute.me.sdk.common.IpUtil;
 import com.github.dreamroute.me.sdk.controller.ConfigResource;
 import com.github.dreamroute.me.server.config.ConfigStore;
 
@@ -23,7 +24,7 @@ import com.github.dreamroute.me.server.config.ConfigStore;
 public class ConfigResourceImpl implements ConfigResource {
 
     @Override
-    public int registryConfig(@RequestBody Config config) {
+    public String registryConfig(@RequestBody Config config) {
 
         // 缓存客户端连接
         cacheConn(config);
@@ -33,8 +34,9 @@ public class ConfigResourceImpl implements ConfigResource {
 
         // 缓存表配置信息
         cacheAdapter(config);
-
-        return 0;
+        
+        // 获取本地IP并返回本地IP
+        return IpUtil.getIp();
     }
 
     private void cacheAdapter(Config config) {
