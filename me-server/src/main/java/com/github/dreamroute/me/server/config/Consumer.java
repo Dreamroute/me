@@ -47,9 +47,11 @@ public class Consumer implements RocketMQListener<String> {
         Operation opt = JSON.parseObject(message, Operation.class);
         String database = opt.getDatabase();
         String tableName = opt.getTable();
+        String fullName = database + '.' + tableName;
         
         // 过滤不需要处理的表
-        if (!ConfigStore.TABLE_NAME.contains(database + '.' + tableName)) {
+        log.info("表名: {}", fullName);
+        if (!ConfigStore.TABLE_NAME.contains(fullName)) {
             return;
         }
         
