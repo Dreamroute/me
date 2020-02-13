@@ -4,6 +4,7 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 import com.alibaba.fastjson.JSON;
@@ -31,6 +32,9 @@ public class ClientHandler extends ChannelInboundHandlerAdapter {
     
     @Autowired
     private CallBackProcessor processor;
+    
+    @Value("${me.platformId}")
+    private Long platformId;
 
     @Override
     public void channelRead(ChannelHandlerContext ctx, Object msg) throws Exception {
@@ -48,7 +52,7 @@ public class ClientHandler extends ChannelInboundHandlerAdapter {
             IdleState state = ((IdleStateEvent) evt).state();
             if (state == IdleState.ALL_IDLE) {
                 log.info("客户端触发心跳, 时间: {}", new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.SSS").format(new Date()));
-                ctx.writeAndFlush(new Addr(String.valueOf(IpUtil.getIp())));
+                ctx.writeAndFlush(new Addr(platformId, String.valueOf(IpUtil.getIp())));
             }
         }
     }

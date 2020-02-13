@@ -16,8 +16,6 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 public class Config {
     
-    private String heartbeatIp;
-    private int heartbeatPort;
     private Long platformId;
     private List<Adapter> adapter;
 

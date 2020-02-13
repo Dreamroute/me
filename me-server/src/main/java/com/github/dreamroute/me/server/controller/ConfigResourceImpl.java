@@ -26,9 +26,6 @@ public class ConfigResourceImpl implements ConfigResource {
     @Override
     public String registryConfig(@RequestBody Config config) {
 
-        // 缓存客户端连接
-        cacheConn(config);
-
         // 缓存mapping
         cacheMapping(config);
 
@@ -37,10 +34,6 @@ public class ConfigResourceImpl implements ConfigResource {
         
         // 获取本地IP并返回本地IP
         return IpUtil.getIp();
-    }
-
-    private void cacheConn(Config config) {
-        ConfigStore.cache(config.getPlatformId(), config.getHeartbeatIp() + ":" + config.getHeartbeatPort());
     }
     
     private void cacheMapping(Config config) {

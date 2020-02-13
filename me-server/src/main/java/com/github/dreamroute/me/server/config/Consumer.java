@@ -2,6 +2,7 @@ package com.github.dreamroute.me.server.config;
 
 import java.util.Map;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.locks.ReentrantLock;
 
@@ -47,14 +48,14 @@ public class Consumer implements RocketMQListener<String> {
         String database = opt.getDatabase();
         String tableName = opt.getTable();
         String fullName = database + '.' + tableName;
-        
+
         // 过滤不需要处理的表
         log.info("表名: {}", fullName);
         if (!ConfigStore.TABLE_NAME.contains(fullName)) {
             log.info("此表数据无需处理，直接返回");
             return;
         }
-        
+
         Long platformId = ConfigStore.getPlatformIdByDatabaseName(database);
         Map<String, Adapter> adapterMap = ConfigStore.getAdapterByPlatformId(platformId);
         if (adapterMap == null || adapterMap.isEmpty()) {
@@ -115,34 +116,28 @@ public class Consumer implements RocketMQListener<String> {
 
     private String[] processData(Operation opt, Long platformId, Adapter adapter) {
         // 此处定义为data = null，如果isRefactor=true内的所有远程调用均失败，那么data == null，上游需要对此null进行异常抛出，避免消息被消费掉
-        String data[] = null;
+        String[] data = null;
         if (adapter.isRefactor()) {
-            Set<String> hosts = ConfigStore.getHostsByPlatformId(platformId);
-            if (hosts == null || hosts.isEmpty()) {
+            Set<ChannelHandlerContext> ctxSet = MeCache.CTX_MAP.get(platformId);
+            if (ctxSet == null || ctxSet.isEmpty()) {
                 log.info("ID为{}的平台未注册到ME平台, 数据无法被同步到ES");
                 throw new MeException("此异常无需解决，抛出异常，避免消息被成功ack");
             } else {
-                ChannelHandlerContext ctx = null;
-                for (String host: hosts) {
-                    String ip = host.split(":")[0];
-                    ctx = MeCache.CTX_MAP.get(ip);
-                    if (ctx != null) {
-                        break;
-                    }
+                Optional<ChannelHandlerContext> chc = ctxSet.stream().findAny();
+                if (chc.isPresent()) {
+                    ChannelHandlerContext ctx = chc.get();
+                    CallBack cb = new CallBack();
+                    cb.setTableName(opt.getTable());
+                    cb.setData(opt.getData());
+                    cb.setType(Type.valueOf(opt.getType()));
+                    ctx.writeAndFlush(cb);
+                    MeFuture<CallBack> mf = new DefaultMefuture<>();
+                    MeCache.THREAD_WAITE_CACHE.put(cb.getId(), mf);
+                    CallBack result = mf.get(10);
+                    if (result == null)
+                        throw new MeException("调用客户端返回了空, 请求参数为: {}" + JSON.toJSONString(cb));
+                    data = result.getData();
                 }
-                if (ctx == null)
-                    throw new MeException("客户端不在线，抛出异常，等待下次消费");
-                CallBack cb = new CallBack();
-                cb.setTableName(opt.getTable());
-                cb.setData(opt.getData());
-                cb.setType(Type.valueOf(opt.getType()));
-                ctx.writeAndFlush(cb);
-                MeFuture<CallBack> mf = new DefaultMefuture<>();
-                MeCache.THREAD_WAITE_CACHE.put(cb.getId(), mf);
-                CallBack result = mf.get();
-                if (result == null)
-                    throw new MeException("调用客户端返回了空, 请求参数为: {}" + JSON.toJSONString(cb));
-                data = result.getData();
             }
         } else {
             data = opt.getData();

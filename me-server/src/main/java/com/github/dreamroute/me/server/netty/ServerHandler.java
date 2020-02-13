@@ -2,6 +2,7 @@ package com.github.dreamroute.me.server.netty;
 
 import com.github.dreamroute.me.sdk.common.CallBack;
 import com.github.dreamroute.me.sdk.netty.Addr;
+import com.vip.vjtools.vjkit.collection.type.ConcurrentHashSet;
 
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelInboundHandlerAdapter;
@@ -18,7 +19,7 @@ public class ServerHandler extends ChannelInboundHandlerAdapter {
             Addr addr = (Addr) msg;
             log.info("Server接收到客户端上报的IP地址为: {}", addr.getClientIp());
             
-            MeCache.CTX_MAP.put(addr.getClientIp(), ctx);
+            MeCache.CTX_MAP.computeIfAbsent(addr.getPlatformId(), platformId -> new ConcurrentHashSet<>()).add(ctx);
         } else if (msg instanceof CallBack) {
             // 处理同步调用的返回数据
             CallBack cb = (CallBack) msg;

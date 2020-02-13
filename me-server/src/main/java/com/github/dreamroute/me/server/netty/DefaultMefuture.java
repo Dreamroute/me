@@ -25,6 +25,11 @@ public class DefaultMefuture<T> implements MeFuture<T> {
         // 默认10秒
         return this.get(10, TimeUnit.SECONDS);
     }
+    
+    @Override
+    public T get(long timeout) {
+        return this.get(timeout, TimeUnit.SECONDS);
+    }
 
     @Override
     public T get(long timeout, TimeUnit unit) {

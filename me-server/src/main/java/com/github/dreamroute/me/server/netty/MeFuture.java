@@ -6,6 +6,8 @@ public interface MeFuture<T> {
 
     T get();
     
+    T get(long timeout);
+    
     T get(long timeout, TimeUnit unit);
     
     void set(T resp);

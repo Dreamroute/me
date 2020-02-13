@@ -5,7 +5,6 @@ import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;
@@ -15,16 +14,17 @@ import com.github.dreamroute.me.server.entity.TableInfo;
 import com.github.dreamroute.me.server.service.DatabaseInfoService;
 import com.github.dreamroute.me.server.service.TableInfoService;
 import com.vip.vjtools.vjkit.collection.type.ConcurrentHashSet;
+
+import lombok.AllArgsConstructor;
 /**
  * @author w.dehai
  */
-@Component
 @Order(1)
+@Component
+@AllArgsConstructor
 public class InitConfig implements CommandLineRunner {
     
-    @Autowired
     private DatabaseInfoService databaseInfoService;
-    @Autowired
     private TableInfoService tableInfoService;
 
     @Override

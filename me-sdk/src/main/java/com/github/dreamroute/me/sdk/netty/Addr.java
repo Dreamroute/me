@@ -16,6 +16,7 @@ public class Addr implements Serializable {
      */
     private static final long serialVersionUID = 4792425917218848642L;
     
+    private Long platformId;
     private String clientIp;
 
 }

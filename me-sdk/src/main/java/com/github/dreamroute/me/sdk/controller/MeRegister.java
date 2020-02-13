@@ -4,14 +4,12 @@ import java.util.List;
 import java.util.Objects;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.scheduling.annotation.Scheduled;
 
 import com.alibaba.fastjson.JSON;
 import com.github.dreamroute.me.sdk.common.Adapter;
 import com.github.dreamroute.me.sdk.common.Config;
-import com.github.dreamroute.me.sdk.common.IpUtil;
 import com.github.dreamroute.me.sdk.netty.Client;
 
 import lombok.extern.slf4j.Slf4j;
@@ -26,25 +24,21 @@ import lombok.extern.slf4j.Slf4j;
 public class MeRegister {
 
     @Autowired
+    private Client client;
+    @Autowired
     private Config config;
     @Autowired
     private ConfigResource configResource;
-    @Autowired
-    private Client client;
 
-    @Value("${server.port}")
-    private int port;
-    
-    @Value("${me.client.ip:error}")
-    private String ip;
-    
     private String existServerIp;
     private boolean existClient;
 
     @Scheduled(cron = "1/10 * * * * ?")
     public void register() {
+
+        // 检查客户端配置文件是否符合要求
         validateMapping(config);
-        config.setHeartbeatPort(port);
+
         String serverIp = null;
         try {
             serverIp = configResource.registryConfig(config);
@@ -57,28 +51,24 @@ public class MeRegister {
                 existServerIp = serverIp;
                 existClient = false;
             }
-            
+
             // 创建长连接客户端
             createClient(serverIp);
         } catch (Exception e) {
             log.error("上报配置到ME失败" + e, e);
             existClient = false;
         }
-        
+
     }
 
     private void createClient(String serverIp) {
-        if (existClient)
-            return;
-        client.createClient(serverIp);
-        existClient = true;
+        if (!existClient) {
+            client.createClient(serverIp);
+            existClient = true;
+        }
     }
 
     private void validateMapping(Config config) {
-        
-        if (Objects.equals(ip, "error"))
-            ip = IpUtil.getIp();
-        config.setHeartbeatIp(ip);
 
         Long platformId = config.getPlatformId();
         if (platformId == null) {

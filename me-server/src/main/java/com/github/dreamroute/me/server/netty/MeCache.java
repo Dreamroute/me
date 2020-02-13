@@ -1,6 +1,7 @@
 package com.github.dreamroute.me.server.netty;
 
 import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.TimeUnit;
 
@@ -27,7 +28,7 @@ public class MeCache {
      * 由于不存在不同应用对应同一个ip地址，所以这里的实现没有问题，如果有不同应用对应同一个ip，那么这种做法是不行的，会出现
      * 同一个ip对应多个通道冲突问题
      */
-    public static final Map<String, ChannelHandlerContext> CTX_MAP = new ConcurrentHashMap<>();
+    public static final Map<Long, Set<ChannelHandlerContext>> CTX_MAP = new ConcurrentHashMap<>();
     
     /**
      * 缓存同步调用线程
