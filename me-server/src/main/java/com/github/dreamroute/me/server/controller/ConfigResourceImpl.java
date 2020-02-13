@@ -39,13 +39,10 @@ public class ConfigResourceImpl implements ConfigResource {
         return IpUtil.getIp();
     }
 
-    private void cacheAdapter(Config config) {
-        Map<String, List<Adapter>> tableNameAdapter = config.getAdapter().stream().collect(Collectors.groupingBy(Adapter::getTableName));
-        Map<String, Adapter> adapterMap = new ConcurrentHashMap<>(16);
-        tableNameAdapter.forEach((tableName, adapter) -> adapterMap.put(tableName, adapter.get(0)));
-        ConfigStore.setPlatformIdAdapter(config.getPlatformId(), adapterMap);
+    private void cacheConn(Config config) {
+        ConfigStore.cache(config.getPlatformId(), config.getHeartbeatIp() + ":" + config.getHeartbeatPort());
     }
-
+    
     private void cacheMapping(Config config) {
         Map<String, Map<String, Object>> mp = new ConcurrentHashMap<>();
         List<Adapter> ads = config.getAdapter();
@@ -60,8 +57,11 @@ public class ConfigResourceImpl implements ConfigResource {
         ConfigStore.cacheMapping(config.getPlatformId(), mp);
     }
 
-    private void cacheConn(Config config) {
-        ConfigStore.cache(config.getPlatformId(), config.getHeartbeatIp() + ":" + config.getHeartbeatPort());
+    private void cacheAdapter(Config config) {
+        Map<String, List<Adapter>> tableNameAdapter = config.getAdapter().stream().collect(Collectors.groupingBy(Adapter::getTableName));
+        Map<String, Adapter> adapterMap = new ConcurrentHashMap<>(16);
+        tableNameAdapter.forEach((tableName, adapter) -> adapterMap.put(tableName, adapter.get(0)));
+        ConfigStore.setPlatformIdAdapter(config.getPlatformId(), adapterMap);
     }
 
     private Map<String, Object> createMapping(JSONObject map) {

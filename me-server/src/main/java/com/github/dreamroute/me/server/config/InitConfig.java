@@ -7,6 +7,7 @@ import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
+import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;
 
 import com.github.dreamroute.me.server.entity.DatabaseInfo;
@@ -18,6 +19,7 @@ import com.vip.vjtools.vjkit.collection.type.ConcurrentHashSet;
  * @author w.dehai
  */
 @Component
+@Order(1)
 public class InitConfig implements CommandLineRunner {
     
     @Autowired

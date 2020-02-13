@@ -37,9 +37,9 @@ public class ServerClientTest {
 
                             @Override
                             public void channelReadComplete(ChannelHandlerContext ctx) throws Exception {
-                                ByteBuf buf = ctx.alloc().buffer();
-                                buf.writeCharSequence("return data.", Charset.forName("UTF-8"));
-                                ctx.writeAndFlush(buf);
+//                                ByteBuf buf = ctx.alloc().buffer();
+//                                buf.writeCharSequence("return data.", Charset.forName("UTF-8"));
+//                                ctx.writeAndFlush(buf);
                             }
 
                             @Override
@@ -62,13 +62,15 @@ public class ServerClientTest {
             @Override
             protected void initChannel(SocketChannel ch) throws Exception {
                 ch.pipeline()
-                .addLast(new IdleStateHandler(0, 0, 3))
+                .addLast(new IdleStateHandler(0, 0, 5))
                 .addLast(new ChannelInboundHandlerAdapter() {
                     
                     @Override
                     public void userEventTriggered(ChannelHandlerContext ctx, Object evt) throws Exception {
-                        System.err.println("trigger.");
-                        System.err.println(evt);
+                        System.err.println("客户端触发心跳");
+                        ByteBuf buf = ctx.alloc().buffer();
+                        buf.writeCharSequence("send data.", Charset.forName("UTF-8"));
+                        ctx.writeAndFlush(buf);
                     }
                     
                     @Override

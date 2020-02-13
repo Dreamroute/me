@@ -12,16 +12,8 @@ import com.alibaba.fastjson.JSON;
 import com.github.dreamroute.me.sdk.common.Adapter;
 import com.github.dreamroute.me.sdk.common.Config;
 import com.github.dreamroute.me.sdk.common.IpUtil;
-import com.github.dreamroute.me.sdk.netty.ClientHandler;
+import com.github.dreamroute.me.sdk.netty.Client;
 
-import io.netty.bootstrap.Bootstrap;
-import io.netty.channel.ChannelInitializer;
-import io.netty.channel.ChannelOption;
-import io.netty.channel.ChannelPipeline;
-import io.netty.channel.nio.NioEventLoopGroup;
-import io.netty.channel.socket.SocketChannel;
-import io.netty.channel.socket.nio.NioSocketChannel;
-import io.netty.handler.timeout.IdleStateHandler;
 import lombok.extern.slf4j.Slf4j;
 
 /**
@@ -37,6 +29,8 @@ public class MeRegister {
     private Config config;
     @Autowired
     private ConfigResource configResource;
+    @Autowired
+    private Client client;
 
     @Value("${server.port}")
     private int port;
@@ -47,50 +41,36 @@ public class MeRegister {
     private String existServerIp;
     private boolean existClient;
 
-    @Scheduled(cron = "1/30 * * * * ?")
+    @Scheduled(cron = "1/10 * * * * ?")
     public void register() {
         validateMapping(config);
         config.setHeartbeatPort(port);
         String serverIp = null;
         try {
             serverIp = configResource.registryConfig(config);
-            if (serverIp != null && serverIp.length() > 0) {
-                log.info("上报配置到ME成功");
+            if (serverIp == null || serverIp.length() == 0) {
+                log.info("服务端已下线");
+                return;
             }
-            if (!Objects.equals(serverIp, existServerIp)) {
+            log.info("上报配置到ME成功");
+            if (existServerIp == null || !Objects.equals(serverIp, existServerIp)) {
+                existServerIp = serverIp;
                 existClient = false;
             }
+            
+            // 创建长连接客户端
+            createClient(serverIp);
         } catch (Exception e) {
             log.error("上报配置到ME失败" + e, e);
+            existClient = false;
         }
         
-        // 创建长连接客户端
-        createClient(serverIp);
     }
 
     private void createClient(String serverIp) {
         if (existClient)
             return;
-        NioEventLoopGroup worker = new NioEventLoopGroup();
-        Bootstrap bootstrap = new Bootstrap()
-                .group(worker)
-                .channel(NioSocketChannel.class)
-                .option(ChannelOption.SO_KEEPALIVE, false)
-                .handler(new ChannelInitializer<SocketChannel>() {
-                    @Override
-                    protected void initChannel(SocketChannel ch) throws Exception {
-                        ChannelPipeline pipleline = ch.pipeline();
-                        pipleline.addLast(new IdleStateHandler(0, 0, 5)); // 5s一次心跳检测
-                        pipleline.addLast(new ClientHandler());
-                    }
-                });
-        try {
-            bootstrap.connect(serverIp, 10086).sync().channel().closeFuture().sync();
-        } catch (InterruptedException e) {
-            log.error("客户端创建长连接到服务端失败");
-            Thread.currentThread().interrupt();
-            worker.shutdownGracefully();
-        }
+        client.createClient(serverIp);
         existClient = true;
     }
 

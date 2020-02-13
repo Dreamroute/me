@@ -11,19 +11,5 @@ public class Const {
 
     public static final int HTTP_SUCCESS = 200;
 
-    public enum HeartbeatMessage {
-        
-        PING("PING"), PONG("PONG");
-        
-        private String message;
-
-        HeartbeatMessage(String message) {
-            this.message = message;
-        }
-        
-        public String getMessage() {
-            return this.message;
-        }
-    }
 
 }
