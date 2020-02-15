@@ -60,8 +60,8 @@ public class ClientHandler extends ChannelInboundHandlerAdapter {
     @Override
     public void channelInactive(ChannelHandlerContext ctx) throws Exception {
         super.channelInactive(ctx);
-        log.info("服务端下线, 客户端与服务端断开连接, 准备移除客户端netty client, 服务端上线之后重新创建.");
         ctx.close();
+        log.info("服务端下线, 客户端与服务端断开连接, 移除客户端netty client, 服务端上线之后重新创建客户端(重新创建而不是重连是因为服务端IP地址可能会发生变化).");
     }
 
 }

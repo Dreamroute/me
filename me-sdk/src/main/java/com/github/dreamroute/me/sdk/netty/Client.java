@@ -26,7 +26,7 @@ public class Client {
     private ClientHandler clientHandler;
     
     public void createClient(String serverIp) {
-        Thread channelThread = new Thread() {
+        new Thread() {
             @Override
             public void run() {
                 NioEventLoopGroup worker = new NioEventLoopGroup();
@@ -51,10 +51,11 @@ public class Client {
                     log.error("客户端创建长连接到服务端失败");
                     Thread.currentThread().interrupt();
                     worker.shutdownGracefully();
+                } finally {
+                    worker.shutdownGracefully();
                 }
             }
-        };
-        channelThread.start();
+        }.start();
     }
 
 }

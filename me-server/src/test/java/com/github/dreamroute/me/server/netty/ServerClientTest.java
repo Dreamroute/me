@@ -23,7 +23,9 @@ public class ServerClientTest {
     @Test
     public void serverTest() throws Exception {
         ServerBootstrap bootstrap = new ServerBootstrap();
-        bootstrap.group(new NioEventLoopGroup(), new NioEventLoopGroup()).channel(NioServerSocketChannel.class).option(ChannelOption.SO_REUSEADDR, true)
+        NioEventLoopGroup boss = new NioEventLoopGroup();
+        NioEventLoopGroup worker = new NioEventLoopGroup();
+        bootstrap.group(boss, worker).channel(NioServerSocketChannel.class).option(ChannelOption.SO_REUSEADDR, true)
                 .childHandler(new ChannelInitializer<SocketChannel>() {
                     @Override
                     protected void initChannel(SocketChannel ch) throws Exception {
@@ -37,9 +39,9 @@ public class ServerClientTest {
 
                             @Override
                             public void channelReadComplete(ChannelHandlerContext ctx) throws Exception {
-//                                ByteBuf buf = ctx.alloc().buffer();
-//                                buf.writeCharSequence("return data.", Charset.forName("UTF-8"));
-//                                ctx.writeAndFlush(buf);
+                                ByteBuf buf = ctx.alloc().buffer();
+                                buf.writeCharSequence("return data.", Charset.forName("UTF-8"));
+                                ctx.writeAndFlush(buf);
                             }
 
                             @Override
@@ -49,16 +51,26 @@ public class ServerClientTest {
                             public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) throws Exception {
                                 cause.printStackTrace();
                             }
+                            
+                            @Override
+                            public void channelInactive(ChannelHandlerContext ctx) throws Exception {
+                                ctx.close();
+                                boss.shutdownGracefully();
+                                worker.shutdownGracefully();
+                            }
+                            
                         });
                     }
                 });
         ChannelFuture future = bootstrap.bind(8082).sync();
         future.channel().closeFuture().sync();
+        Thread.sleep(Long.MAX_VALUE);
     }
 
     @Test
     public void clientTest() throws Exception {
-        Bootstrap bootstrap = new Bootstrap().group(new NioEventLoopGroup()).channel(NioSocketChannel.class).option(ChannelOption.SO_KEEPALIVE, true).handler(new ChannelInitializer<SocketChannel>() {
+        NioEventLoopGroup pool = new NioEventLoopGroup();
+        Bootstrap bootstrap = new Bootstrap().group(pool).channel(NioSocketChannel.class).option(ChannelOption.SO_KEEPALIVE, true).handler(new ChannelInitializer<SocketChannel>() {
             @Override
             protected void initChannel(SocketChannel ch) throws Exception {
                 ch.pipeline()
@@ -89,15 +101,16 @@ public class ServerClientTest {
 
                     @Override
                     public void channelActive(ChannelHandlerContext ctx) throws Exception {
-//                        ByteBuf buf = ctx.alloc().buffer();
-//                        buf.writeCharSequence("send data.", Charset.forName("UTF-8"));
-//                        ctx.writeAndFlush(buf);
+                        ByteBuf buf = ctx.alloc().buffer();
+                        buf.writeCharSequence("send data.", Charset.forName("UTF-8"));
+                        ctx.writeAndFlush(buf);
                     }
                 });
             }
         });
         ChannelFuture future = bootstrap.connect("127.0.0.1", 8082).sync();
         future.channel().closeFuture().sync();
+        Thread.sleep(Long.MAX_VALUE);
     }
 
 }

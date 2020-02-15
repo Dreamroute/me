@@ -1,5 +1,8 @@
 package com.github.dreamroute.me.server.netty;
 
+import java.util.Iterator;
+import java.util.Objects;
+
 import com.github.dreamroute.me.sdk.common.CallBack;
 import com.github.dreamroute.me.sdk.netty.Addr;
 import com.vip.vjtools.vjkit.collection.type.ConcurrentHashSet;
@@ -27,6 +30,23 @@ public class ServerHandler extends ChannelInboundHandlerAdapter {
             future.set(cb);
         }
         ReferenceCountUtil.release(msg);
+    }
+    
+    @Override
+    public void channelInactive(ChannelHandlerContext ctx) throws Exception {
+        super.channelInactive(ctx);
+        log.info("服务端下线, 客户端与服务端断开连接, 移除当前通道.");
+        ctx.close();
+        String ctxName = ctx.name();
+        MeCache.CTX_MAP.values().forEach(ctxSet -> {
+           Iterator<ChannelHandlerContext> ct = ctxSet.iterator(); 
+           while (ct.hasNext()) {
+               if (Objects.equals(ct.next().name(), ctxName)) {
+                   ct.remove();
+                   break;
+               }
+           }
+        });
     }
 
 }
