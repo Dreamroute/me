@@ -9,7 +9,7 @@ import com.github.dreamroute.me.sdk.common.Config;
 /**
  * @author w.dehai
  */
-@FeignClient(value = "me-wangdehai")
+@FeignClient(value = "me")
 public interface ConfigResource {
 
     @PostMapping("/registryConfig")
