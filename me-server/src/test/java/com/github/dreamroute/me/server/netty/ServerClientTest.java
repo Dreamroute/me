@@ -17,15 +17,20 @@ import io.netty.channel.socket.SocketChannel;
 import io.netty.channel.socket.nio.NioServerSocketChannel;
 import io.netty.channel.socket.nio.NioSocketChannel;
 import io.netty.handler.timeout.IdleStateHandler;
+import lombok.extern.slf4j.Slf4j;
 
+@Slf4j
 public class ServerClientTest {
-
+    
     @Test
     public void serverTest() throws Exception {
+        log.info("www");
         ServerBootstrap bootstrap = new ServerBootstrap();
         NioEventLoopGroup boss = new NioEventLoopGroup();
         NioEventLoopGroup worker = new NioEventLoopGroup();
-        bootstrap.group(boss, worker).channel(NioServerSocketChannel.class).option(ChannelOption.SO_REUSEADDR, true)
+        bootstrap.group(boss, worker)
+                .channel(NioServerSocketChannel.class)
+                .option(ChannelOption.SO_REUSEADDR, true)
                 .childHandler(new ChannelInitializer<SocketChannel>() {
                     @Override
                     protected void initChannel(SocketChannel ch) throws Exception {
@@ -34,7 +39,8 @@ public class ServerClientTest {
                             public void channelRead(ChannelHandlerContext ctx, Object msg) throws Exception {
                                 ByteBuf buf = (ByteBuf) msg;
                                 System.err.println(buf.toString(Charset.forName("UTF-8")));
-                                buf.release();
+//                                buf.release();
+//                                ctx.fireChannelRead(msg);
                             }
 
                             @Override
@@ -55,8 +61,6 @@ public class ServerClientTest {
                             @Override
                             public void channelInactive(ChannelHandlerContext ctx) throws Exception {
                                 ctx.close();
-                                boss.shutdownGracefully();
-                                worker.shutdownGracefully();
                             }
                             
                         });
@@ -64,7 +68,9 @@ public class ServerClientTest {
                 });
         ChannelFuture future = bootstrap.bind(8082).sync();
         future.channel().closeFuture().sync();
-        Thread.sleep(Long.MAX_VALUE);
+        System.err.println(123);
+        boss.shutdownGracefully();
+        worker.shutdownGracefully();
     }
 
     @Test
@@ -110,7 +116,7 @@ public class ServerClientTest {
         });
         ChannelFuture future = bootstrap.connect("127.0.0.1", 8082).sync();
         future.channel().closeFuture().sync();
-        Thread.sleep(Long.MAX_VALUE);
+        System.err.println();
     }
 
 }

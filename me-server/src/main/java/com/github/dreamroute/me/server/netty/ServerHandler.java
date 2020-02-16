@@ -3,16 +3,21 @@ package com.github.dreamroute.me.server.netty;
 import java.util.Iterator;
 import java.util.Objects;
 
+import org.springframework.stereotype.Component;
+
 import com.github.dreamroute.me.sdk.common.CallBack;
 import com.github.dreamroute.me.sdk.netty.Addr;
 import com.vip.vjtools.vjkit.collection.type.ConcurrentHashSet;
 
+import io.netty.channel.ChannelHandler.Sharable;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelInboundHandlerAdapter;
 import io.netty.util.ReferenceCountUtil;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
+@Sharable
+@Component
 public class ServerHandler extends ChannelInboundHandlerAdapter {
     
     @Override

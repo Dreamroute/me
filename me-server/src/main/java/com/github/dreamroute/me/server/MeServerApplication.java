@@ -30,7 +30,7 @@ import tk.mybatis.spring.annotation.MapperScan;
 @EnableDiscoveryClient
 @EnableAspectJAutoProxy
 @EnableTransactionManagement
-@ComponentScan(basePackages = {"com.github.dreamroute.me.server"})
+@ComponentScan(basePackages = {"com.github.dreamroute.me.server", "com.github.dreamroute.me.sdk.netty.codec"})
 @MapperScan(basePackages = {"com.github.dreamroute.me.server.mapper"})
 @ComponentScan(basePackageClasses = ESClientConfig.class, includeFilters = {@Filter(type = FilterType.ASSIGNABLE_TYPE, classes = {ESClientConfig.class})}, useDefaultFilters = false)
 @ComponentScan(basePackageClasses = DataSourceConfig.class, includeFilters = {@Filter(type = FilterType.ASSIGNABLE_TYPE, classes = {DataSourceConfig.class})}, useDefaultFilters = false)
