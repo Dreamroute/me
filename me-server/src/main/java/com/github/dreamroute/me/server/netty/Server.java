@@ -31,6 +31,7 @@ public class Server implements CommandLineRunner {
                     @Override
                     protected void initChannel(SocketChannel ch) throws Exception {
                         ch.pipeline()
+                            // 解码器不能使用@Sharable方式，容易混乱
                             .addLast(new ObjectDecoder(1024 * 1024, ClassResolvers.weakCachingConcurrentResolver(this.getClass().getClassLoader())))
                             .addLast(new ObjectEncoder())
                             .addLast(serverHandler);
