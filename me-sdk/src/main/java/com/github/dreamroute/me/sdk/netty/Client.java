@@ -4,8 +4,6 @@ import java.util.concurrent.TimeUnit;
 
 import org.springframework.stereotype.Component;
 
-import com.github.dreamroute.me.sdk.netty.codec.Encoder;
-
 import io.netty.bootstrap.Bootstrap;
 import io.netty.channel.ChannelInitializer;
 import io.netty.channel.ChannelOption;
@@ -13,7 +11,9 @@ import io.netty.channel.ChannelPipeline;
 import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.SocketChannel;
 import io.netty.channel.socket.nio.NioSocketChannel;
+import io.netty.handler.codec.serialization.ClassResolvers;
 import io.netty.handler.codec.serialization.ObjectDecoder;
+import io.netty.handler.codec.serialization.ObjectEncoder;
 import io.netty.handler.timeout.IdleStateHandler;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -24,8 +24,6 @@ import lombok.extern.slf4j.Slf4j;
 public class Client {
     
     private ClientHandler clientHandler;
-    private ObjectDecoder decoder;
-    private Encoder encoder;
     
     public void createClient(String serverIp) {
         new Thread() {
@@ -42,8 +40,8 @@ public class Client {
                                 ChannelPipeline pipleline = ch.pipeline();
                                 pipleline
                                     .addLast(new IdleStateHandler(0, 0 , 10, TimeUnit.SECONDS)) // 心跳
-                                    .addLast(decoder)
-                                    .addLast(encoder)
+                                    .addLast(new ObjectDecoder(1024 * 1024, ClassResolvers.weakCachingConcurrentResolver(this.getClass().getClassLoader())))
+                                    .addLast(new ObjectEncoder())
                                     .addLast(clientHandler);
                             }
                         });

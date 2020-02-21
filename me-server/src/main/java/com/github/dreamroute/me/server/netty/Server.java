@@ -4,8 +4,6 @@ import org.springframework.boot.CommandLineRunner;
 import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;
 
-import com.github.dreamroute.me.sdk.netty.codec.Encoder;
-
 import io.netty.bootstrap.ServerBootstrap;
 import io.netty.channel.ChannelFuture;
 import io.netty.channel.ChannelInitializer;
@@ -13,7 +11,9 @@ import io.netty.channel.ChannelOption;
 import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.SocketChannel;
 import io.netty.channel.socket.nio.NioServerSocketChannel;
+import io.netty.handler.codec.serialization.ClassResolvers;
 import io.netty.handler.codec.serialization.ObjectDecoder;
+import io.netty.handler.codec.serialization.ObjectEncoder;
 import lombok.AllArgsConstructor;
 
 @Order(2)
@@ -22,8 +22,6 @@ import lombok.AllArgsConstructor;
 public class Server implements CommandLineRunner {
     
     private ServerHandler serverHandler;
-    private ObjectDecoder decoder;
-    private Encoder encoder;
 
     @Override
     public void run(String... args) throws Exception {
@@ -33,8 +31,8 @@ public class Server implements CommandLineRunner {
                     @Override
                     protected void initChannel(SocketChannel ch) throws Exception {
                         ch.pipeline()
-                            .addLast(decoder)
-                            .addLast(encoder)
+                            .addLast(new ObjectDecoder(1024 * 1024, ClassResolvers.weakCachingConcurrentResolver(this.getClass().getClassLoader())))
+                            .addLast(new ObjectEncoder())
                             .addLast(serverHandler);
                     }
                 });
