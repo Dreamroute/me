@@ -1,2 +1,7 @@
 /.project
 /.settings/
+/.idea/
+/me.iml
+/me-server/me-server.iml
+/me-client/me-client.iml
+/me-sdk/me-sdk.iml
