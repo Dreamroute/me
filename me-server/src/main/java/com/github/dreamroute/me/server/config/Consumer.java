@@ -120,7 +120,7 @@ public class Consumer implements RocketMQListener<String> {
         if (adapter.isRefactor()) {
             Set<ChannelHandlerContext> ctxSet = MeCache.CTX_MAP.get(platformId);
             if (ctxSet == null || ctxSet.isEmpty()) {
-                log.info("ID为{}的平台未注册到ME平台, 数据无法被同步到ES");
+                log.info("ID为{}的平台未注册到ME平台, 数据无法被同步到ES", platformId);
                 throw new MeException("此异常无需解决，抛出异常，避免消息被成功ack");
             } else {
                 Optional<ChannelHandlerContext> chc = ctxSet.stream().findAny();
