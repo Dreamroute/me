@@ -1,16 +1,5 @@
 package com.github.dreamroute.me.server.config;
 
-import java.util.Map;
-import java.util.Objects;
-import java.util.Optional;
-import java.util.Set;
-import java.util.concurrent.locks.ReentrantLock;
-
-import org.apache.rocketmq.spring.annotation.RocketMQMessageListener;
-import org.apache.rocketmq.spring.core.RocketMQListener;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
-
 import com.alibaba.fastjson.JSON;
 import com.github.dreamroute.me.sdk.common.Adapter;
 import com.github.dreamroute.me.sdk.common.CallBack;
@@ -22,9 +11,17 @@ import com.github.dreamroute.me.server.netty.DefaultMefuture;
 import com.github.dreamroute.me.server.netty.MeCache;
 import com.github.dreamroute.me.server.netty.MeFuture;
 import com.github.dreamroute.me.server.service.CrudService;
-
 import io.netty.channel.ChannelHandlerContext;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.rocketmq.spring.annotation.RocketMQMessageListener;
+import org.apache.rocketmq.spring.core.RocketMQListener;
+import org.springframework.stereotype.Component;
+
+import java.util.Map;
+import java.util.Objects;
+import java.util.Optional;
+import java.util.Set;
+import java.util.concurrent.locks.ReentrantLock;
 
 /**
  * @author w.dehai
@@ -34,8 +31,11 @@ import lombok.extern.slf4j.Slf4j;
 @RocketMQMessageListener(topic = "20200109", consumerGroup = "me-group")
 public class Consumer implements RocketMQListener<String> {
 
-    @Autowired
     private CrudService crudService;
+
+    public Consumer(CrudService crudService) {
+        this.crudService = crudService;
+    }
 
     private static final ReentrantLock lock = new ReentrantLock();
 

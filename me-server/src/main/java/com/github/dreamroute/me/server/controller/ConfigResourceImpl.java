@@ -1,14 +1,5 @@
 package com.github.dreamroute.me.server.controller;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.stream.Collectors;
-
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RestController;
-
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.github.dreamroute.me.sdk.common.Adapter;
@@ -16,6 +7,14 @@ import com.github.dreamroute.me.sdk.common.Config;
 import com.github.dreamroute.me.sdk.common.IpUtil;
 import com.github.dreamroute.me.sdk.controller.ConfigResource;
 import com.github.dreamroute.me.server.config.ConfigStore;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RestController;
+
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.stream.Collectors;
 
 /**
  * @author w.dehai
@@ -50,27 +49,25 @@ public class ConfigResourceImpl implements ConfigResource {
         ConfigStore.cacheMapping(config.getPlatformId(), mp);
     }
 
-    private void cacheAdapter(Config config) {
-        Map<String, List<Adapter>> tableNameAdapter = config.getAdapter().stream().collect(Collectors.groupingBy(Adapter::getTableName));
-        Map<String, Adapter> adapterMap = new ConcurrentHashMap<>(16);
-        tableNameAdapter.forEach((tableName, adapter) -> adapterMap.put(tableName, adapter.get(0)));
-        ConfigStore.setPlatformIdAdapter(config.getPlatformId(), adapterMap);
-    }
-
     private Map<String, Object> createMapping(JSONObject map) {
         Map<String, Map<String, Object>> properties = new HashMap<>();
-        if (map != null && !map.isEmpty()) {
-            map.forEach((propName, type) -> {
-                Map<String, Object> m = new HashMap<>();
-                m.put("type", type);
-                properties.put(propName, m);
-            });
-        }
+        map.forEach((propName, type) -> {
+            Map<String, Object> m = new HashMap<>();
+            m.put("type", type);
+            properties.put(propName, m);
+        });
 
         Map<String, Object> mapping = new HashMap<>();
         mapping.put("properties", properties);
 
         return mapping;
+    }
+
+    private void cacheAdapter(Config config) {
+        Map<String, List<Adapter>> tableNameAdapter = config.getAdapter().stream().collect(Collectors.groupingBy(Adapter::getTableName));
+        Map<String, Adapter> adapterMap = new ConcurrentHashMap<>(16);
+        tableNameAdapter.forEach((tableName, adapter) -> adapterMap.put(tableName, adapter.get(0)));
+        ConfigStore.setPlatformIdAdapter(config.getPlatformId(), adapterMap);
     }
 
 }
