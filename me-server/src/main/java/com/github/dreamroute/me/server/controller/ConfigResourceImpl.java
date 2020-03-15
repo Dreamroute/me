@@ -34,18 +34,17 @@ public class ConfigResourceImpl implements ConfigResource {
         // 获取本地IP并返回本地IP
         return IpUtil.getIp();
     }
-    
+
     private void cacheMapping(Config config) {
         Map<String, Map<String, Object>> mp = new ConcurrentHashMap<>();
+        // ads在客户端上报配置信息时已经做检查，不会为空
         List<Adapter> ads = config.getAdapter();
-        if (ads != null && !ads.isEmpty()) {
-            ads.forEach(ad -> {
-                String mapping = ad.getMapping();
-                JSONObject map = JSON.parseObject(mapping);
-                Map<String, Object> m = createMapping(map);
-                mp.put(ad.getIndex(), m);
-            });
-        }
+        ads.forEach(ad -> {
+            String mapping = ad.getMapping();
+            JSONObject map = JSON.parseObject(mapping);
+            Map<String, Object> m = createMapping(map);
+            mp.put(ad.getIndex(), m);
+        });
         ConfigStore.cacheMapping(config.getPlatformId(), mp);
     }
 
@@ -67,7 +66,7 @@ public class ConfigResourceImpl implements ConfigResource {
         Map<String, List<Adapter>> tableNameAdapter = config.getAdapter().stream().collect(Collectors.groupingBy(Adapter::getTableName));
         Map<String, Adapter> adapterMap = new ConcurrentHashMap<>(16);
         tableNameAdapter.forEach((tableName, adapter) -> adapterMap.put(tableName, adapter.get(0)));
-        ConfigStore.setPlatformIdAdapter(config.getPlatformId(), adapterMap);
+        ConfigStore.cachePlatformIdAdapter(config.getPlatformId(), adapterMap);
     }
 
 }

@@ -1,18 +1,17 @@
 package com.github.dreamroute.me.sdk.controller;
 
-import java.util.List;
-import java.util.Objects;
-
+import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONObject;
+import com.github.dreamroute.me.sdk.common.Adapter;
+import com.github.dreamroute.me.sdk.common.Config;
+import com.github.dreamroute.me.sdk.netty.Client;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.scheduling.annotation.Scheduled;
 
-import com.alibaba.fastjson.JSON;
-import com.github.dreamroute.me.sdk.common.Adapter;
-import com.github.dreamroute.me.sdk.common.Config;
-import com.github.dreamroute.me.sdk.netty.Client;
-
-import lombok.extern.slf4j.Slf4j;
+import java.util.List;
+import java.util.Objects;
 
 /**
  * 将本地配置文件上报到me服务器，使用定时任务而不是CommandLineRunner的方式可以实现服务端掉线再上线之后的重连 原理：解析application.yml文件，将解析结果使用RestTemplate上报到服务器
@@ -88,12 +87,18 @@ public class MeRegister {
             if (!isJson(mapping)) {
                 log.error("配置文件中me.mapping格式不正确，需要符合JSON格式");
             }
+
         }
     }
 
+    /**
+     * 格式不对，或者为空都报错
+     */
     public static boolean isJson(String content) {
         try {
-            JSON.parseObject(content);
+            JSONObject jo = JSON.parseObject(content);
+            if (jo.isEmpty())
+                return false;
             return true;
         } catch (Exception e) {
             return false;

@@ -1,10 +1,10 @@
 package com.github.dreamroute.me.server.config;
 
-import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
-
 import com.github.dreamroute.me.sdk.common.Adapter;
 import com.vip.vjtools.vjkit.collection.type.ConcurrentHashSet;
+
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * @author w.dehai
@@ -24,15 +24,15 @@ public class ConfigStore {
     static final ConcurrentHashSet<String> TABLE_NAME = new ConcurrentHashSet<>();
 
     /**
-     * <key=平台id, value=<key=表名, value=对应表的配置信息>>
-     * 多个平台会进行并发注册, 所以使用ConcurrentHashMap, 内部Map是全量替换的, HashMap即可
-     */
-    static final Map<Long, Map<String, Adapter>> PLATFORMID_ADAPTER = new ConcurrentHashMap<>();
-
-    /**
      * <key=platformId, value=<表名, mapping>>
      */
     static final Map<Long, Map<String, Map<String, Object>>> MAPPING_MAP = new ConcurrentHashMap<>();
+
+    /**
+     * <key=平台id, value=<key=表名, value=对应表的配置信息>>
+     * 多个平台会进行并发注册, 所以使用ConcurrentHashMap, 内部Map对于外层来说仅仅是个value, HashMap即可
+     */
+    static final Map<Long, Map<String, Adapter>> PLATFORMID_ADAPTER = new ConcurrentHashMap<>();
     
     public static Long getPlatformIdByDatabaseName(String databaseName) {
         return DATABASENAME_PLATFORMID.get(databaseName);
@@ -46,14 +46,14 @@ public class ConfigStore {
     }
 
     /**
-     * 根据平台id设置表配置信息
+     * 根据平台id设置表配置信息, 由于客户端每个节点的配置都相同，所以这里直接覆盖
      */
-    public static void setPlatformIdAdapter(Long platformId, Map<String, Adapter> adapter) {
+    public static void cachePlatformIdAdapter(Long platformId, Map<String, Adapter> adapter) {
         ConfigStore.PLATFORMID_ADAPTER.put(platformId, adapter);
     }
 
     /**
-     * 缓存mapping
+     * 缓存mapping，由于客户端每个节点的配置都相同，所以这里直接覆盖
      */
     public static void cacheMapping(Long platformId, Map<String, Map<String, Object>> mapping) {
         MAPPING_MAP.put(platformId, mapping);

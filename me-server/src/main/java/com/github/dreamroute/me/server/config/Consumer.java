@@ -114,6 +114,13 @@ public class Consumer implements RocketMQListener<String> {
         }
     }
 
+    /**
+     * // TODO 顺序问题
+     * @param opt
+     * @param platformId
+     * @param adapter
+     * @return
+     */
     private String[] processData(Operation opt, Long platformId, Adapter adapter) {
         // 此处定义为data = null，如果isRefactor=true内的所有远程调用均失败，那么data == null，上游需要对此null进行异常抛出，避免消息被消费掉
         String[] data = null;
@@ -135,7 +142,7 @@ public class Consumer implements RocketMQListener<String> {
                     MeCache.THREAD_WAITE_CACHE.put(cb.getId(), mf);
                     CallBack result = mf.get(10);
                     if (result == null)
-                        throw new MeException("调用客户端返回了空, 请求参数为: {}" + JSON.toJSONString(cb));
+                        throw new MeException("调用客户端返回了空, 可能的原因是客户端报错或者是客户端未处理该数据或者是调用超时，请求参数为: {}" + JSON.toJSONString(cb));
                     data = result.getData();
                 }
             }
