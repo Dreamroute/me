@@ -1,7 +1,5 @@
 package com.github.dreamroute.me.server.entity;
 
-import com.github.dreamroute.me.server.entity.BaseEntity;
-
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;

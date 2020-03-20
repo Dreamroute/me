@@ -116,10 +116,6 @@ public class Consumer implements RocketMQListener<String> {
 
     /**
      * // TODO 顺序问题
-     * @param opt
-     * @param platformId
-     * @param adapter
-     * @return
      */
     private String[] processData(Operation opt, Long platformId, Adapter adapter) {
         // 此处定义为data = null，如果isRefactor=true内的所有远程调用均失败，那么data == null，上游需要对此null进行异常抛出，避免消息被消费掉

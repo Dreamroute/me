@@ -1,20 +1,18 @@
 package com.github.dreamroute.me.server.service;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
+import com.github.dreamroute.me.server.entity.DeleteResp;
+import com.github.dreamroute.me.server.entity.InsertResp;
+import com.github.dreamroute.me.server.entity.UpdateResp;
+import com.github.dreamroute.me.server.entity.User;
+import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
-
-import com.github.dreamroute.me.server.entity.DeleteResp;
-import com.github.dreamroute.me.server.entity.InsertResp;
-import com.github.dreamroute.me.server.entity.UpdateResp;
-import com.github.dreamroute.me.server.entity.User;
-import com.github.dreamroute.me.server.service.CrudService;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 /**
  * @author w.dehai

@@ -50,7 +50,7 @@ public class ConfigControllerTest {
         @SuppressWarnings("unchecked") Map<String, Object> me = (Map<String, Object>) src.get("me");
         @SuppressWarnings("unchecked") List<Map<String, Object>> ads = (List<Map<String, Object>>) me.get("adapter");
         List<Adapter> adapterList = new ArrayList<>(ads.size());
-        if (ads != null && !ads.isEmpty()) {
+        if (!ads.isEmpty()) {
             adapterList = ads.stream().map(e -> Adapter.builder()
                     .tableName(String.valueOf(e.get("tableName")))
                     .index(String.valueOf(e.get("index")))

@@ -97,9 +97,7 @@ public class MeRegister {
     public static boolean isJson(String content) {
         try {
             JSONObject jo = JSON.parseObject(content);
-            if (jo.isEmpty())
-                return false;
-            return true;
+            return !jo.isEmpty();
         } catch (Exception e) {
             return false;
         }
