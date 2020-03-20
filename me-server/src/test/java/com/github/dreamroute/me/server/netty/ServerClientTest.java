@@ -85,7 +85,12 @@ public class ServerClientTest {
                         System.err.println("客户端触发心跳");
                         ByteBuf buf = ctx.alloc().buffer();
                         buf.writeCharSequence("send data.", StandardCharsets.UTF_8);
-                        ctx.writeAndFlush(buf);
+                        ChannelFuture future = ctx.writeAndFlush(buf).sync();
+                        future.addListener(f -> {
+                            Object result = f.get();
+                            System.err.println(result);
+                        });
+                        System.err.println(future);
                     }
                     
                     @Override
@@ -97,9 +102,9 @@ public class ServerClientTest {
 
                     @Override
                     public void channelReadComplete(ChannelHandlerContext ctx) throws Exception {
-                        ByteBuf buf = ctx.alloc().buffer();
-                        buf.writeCharSequence("send data.", StandardCharsets.UTF_8);
-                        ctx.writeAndFlush(buf);
+//                        ByteBuf buf = ctx.alloc().buffer();
+//                        buf.writeCharSequence("send data.", StandardCharsets.UTF_8);
+//                        ctx.writeAndFlush(buf);
                     }
 
                     @Override
