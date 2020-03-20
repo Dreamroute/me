@@ -7,7 +7,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 
 import com.github.dreamroute.me.server.entity.Platform;
-import com.github.dreamroute.me.server.mapper.PlatformMapper;
 /**
  * @author w.dehai
  */
