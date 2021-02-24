@@ -38,7 +38,7 @@ public class MeRegister {
         // 检查客户端配置文件是否符合要求
         validateMapping(config);
 
-        String serverIp = null;
+        String serverIp;
         try {
             serverIp = configResource.registryConfig(config);
             if (serverIp == null || serverIp.length() == 0) {

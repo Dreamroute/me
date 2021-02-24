@@ -1,9 +1,5 @@
 package com.github.dreamroute.me.sdk.netty;
 
-import java.util.concurrent.TimeUnit;
-
-import org.springframework.stereotype.Component;
-
 import io.netty.bootstrap.Bootstrap;
 import io.netty.channel.ChannelInitializer;
 import io.netty.channel.ChannelOption;
@@ -17,13 +13,16 @@ import io.netty.handler.codec.serialization.ObjectEncoder;
 import io.netty.handler.timeout.IdleStateHandler;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.stereotype.Component;
+
+import java.util.concurrent.TimeUnit;
 
 @Slf4j
 @Component
 @AllArgsConstructor
 public class Client {
     
-    private ClientHandler clientHandler;
+    private final ClientHandler clientHandler;
     
     public void createClient(String serverIp) {
         new Thread() {
@@ -36,7 +35,7 @@ public class Client {
                         .option(ChannelOption.SO_KEEPALIVE, false)
                         .handler(new ChannelInitializer<SocketChannel>() {
                             @Override
-                            protected void initChannel(SocketChannel ch) throws Exception {
+                            protected void initChannel(SocketChannel ch) {
                                 ChannelPipeline pipleline = ch.pipeline();
                                 pipleline
                                     .addLast(new IdleStateHandler(0, 0 , 10, TimeUnit.SECONDS)) // 心跳
